@@ -1,6 +1,5 @@
 streamlit
 PyPDF2
-pyttsx3
-python-docx
+gTTS
 Pillow
-gtts
+python-docx
