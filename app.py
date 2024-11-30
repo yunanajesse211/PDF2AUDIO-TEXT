@@ -141,6 +141,7 @@ def text_to_txt(text, p_of_c, p_level):
         return temp_txt.name
     except Exception as e:
         st.error("problem with PDF uploaded.")
+        st.error(e)
 
 
 
@@ -226,4 +227,5 @@ try:
     """
     st.markdown(hide, unsafe_allow_html=True)
 except Exception as e:
-    st.error("Sorry an error occured app can't Load....")
+    st.error("Sorry an error occured app can't Load some files....")
+    st.error(e)
