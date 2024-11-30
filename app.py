@@ -9,7 +9,6 @@ from docx import Document
 from PIL import Image
 from gtts import gTTS
 
-
 # Setting the logo and title of the web application
 img = Image.open('logo.png')
 st.set_page_config(
@@ -19,8 +18,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-
-######***************BASIC FUNCTIONS NEEDED FOR BACKEND FUNCTIONALITIES OF THE APP******####
+######*************** BASIC FUNCTIONS NEEDED FOR BACKEND FUNCTIONALITIES OF THE APP ******####
 
 # Function to extract text from PDF
 def extract_text_from_pdf(uploaded_file):
@@ -33,7 +31,6 @@ def extract_text_from_pdf(uploaded_file):
     except Exception as e:
         st.error("Problem with the PDF uploaded.")
 
-
 # Fallback function using gTTS
 def gtts_text_to_audio(text, lang, suffix):
     try:
@@ -43,7 +40,6 @@ def gtts_text_to_audio(text, lang, suffix):
         return temp_audio.name
     except Exception as e:
         st.error(f"An error occurred with gTTS: {e}")
-
 
 # Function to convert text to audio format with fallback mechanism
 def text_to_audio(text, op_form, v_type, v_rate, p_of_c, p_level):
@@ -77,18 +73,16 @@ def text_to_audio(text, op_form, v_type, v_rate, p_of_c, p_level):
         temp_audio.close()
 
         # Progress simulation
-        for i in range(1, 101, 10):
+        for i in range(0, 101, 10):
             time.sleep(0.5)
             p_of_c.progress(i)
             p_level.text(f"Converting text to {op_form.upper()} audio... {i}%")
-
+        
         engine.save_to_file(text, temp_audio.name)
         engine.runAndWait()
-
         return temp_audio.name
     except Exception as e:
         st.error("An error occurred during text-to-audio conversion.")
-
 
 # Function to save text as a DOC file with progress bar
 def text_to_doc(text, p_of_c, p_level):
@@ -104,14 +98,12 @@ def text_to_doc(text, p_of_c, p_level):
     except Exception as e:
         st.error("Problem with the text-to-DOC conversion.")
 
-
 # Clean text to remove unwanted chars or bytes
 def clean_text(input_text):
     try:
         return ''.join(c for c in input_text if c.isprintable() or c in '\n\t ')
     except Exception as e:
         st.error("Problem with the text cleanup.")
-
 
 # Function to save text as a DOCX file with progress bar
 def text_to_docx(text, p_of_c, p_level):
@@ -131,7 +123,6 @@ def text_to_docx(text, p_of_c, p_level):
     except Exception as e:
         st.error("Problem with the text-to-DOCX conversion.")
 
-
 # Function to save text as a TXT file with progress bar
 def text_to_txt(text, p_of_c, p_level):
     try:
@@ -146,8 +137,7 @@ def text_to_txt(text, p_of_c, p_level):
     except Exception as e:
         st.error("Problem with the text-to-TXT conversion.")
 
-
-#######****************************MAIN APP INTERFACE********************########
+#######**************************** MAIN APP INTERFACE ********************########
 try:
     st.image("logo.png", use_container_width=True)
 
@@ -197,14 +187,15 @@ try:
                     download_label = "Download TXT"
 
                 # Making the file downloadable
-                with open(output_file_path, "rb") as file:
-                    file_data = file.read()
-                    st.download_button(
-                        label=download_label,
-                        data=file_data,
-                        file_name=f"converted.{output_file_path.split('.')[-1]}",
-                        mime=mime_type
-                    )
+                if output_file_path:
+                    with open(output_file_path, "rb") as file:
+                        file_data = file.read()
+                        st.download_button(
+                            label=download_label,
+                            data=file_data,
+                            file_name=f"converted.{output_file_path.split('.')[-1]}",
+                            mime=mime_type
+                        )
 
                 # Cleanup temporary file
                 os.unlink(output_file_path)
