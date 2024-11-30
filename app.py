@@ -1,3 +1,4 @@
+
 import streamlit as st
 import PyPDF2
 import tempfile
@@ -6,6 +7,7 @@ import time
 from docx import Document
 from PIL import Image
 from gtts import gTTS
+from time import sleep
 
 # Setting the logo and title of the web application
 img = Image.open('logo.png')
@@ -32,21 +34,39 @@ def extract_text_from_pdf(uploaded_file):
         st.error("Problem reading the PDF file.")
         return ""
 
-# Function to convert text to audio using gTTS
+# Function to convert text to audio using gTTS with retries
 def gtts_text_to_audio(text, lang, suffix, p_of_c, p_level):
-    try:
-        temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-        for i in range(0, 101, 10):  # Simulating progress
-            time.sleep(0.1)
-            p_of_c.progress(i)
-            p_level.text(f"Converting text to audio... {i}%")
+    retries = 5  # Number of retries in case of failure
+    attempt = 0
 
-        tts = gTTS(text=text, lang=lang)
-        tts.save(temp_audio.name)
-        return temp_audio.name
-    except Exception as e:
-        st.error(f"An error occurred with gTTS: {e}")
-        return None
+    while attempt < retries:
+        try:
+            temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+            
+            # Simulate progress with actual steps for the conversion
+            for i in range(0, 101, 10):  # Update progress bar in increments
+                time.sleep(0.1)  # Simulate processing time
+                p_of_c.progress(i)  # Update progress bar
+                p_level.text(f"Converting text to audio... {i}%")  # Update progress text
+
+            # Create TTS and save the file
+            tts = gTTS(text=text, lang=lang)
+            tts.save(temp_audio.name)
+
+            # Final progress update
+            p_of_c.progress(100)  # Set progress bar to 100% once conversion is done
+            p_level.text("Conversion complete!")
+
+            return temp_audio.name
+        except Exception as e:
+            if '429' in str(e):  # Check for Too Many Requests error
+                attempt += 1
+                sleep(2 ** attempt)  # Exponential backoff: wait longer for each retry
+                
+            else:
+                st.error(f"An error occurred with gTTS: {e}")
+                break
+    return None
 
 # Function to save text as a DOC file
 def text_to_doc(text, p_of_c, p_level):
@@ -170,4 +190,4 @@ try:
     """
     st.markdown(hide, unsafe_allow_html=True)
 except Exception as e:
-    st.error(f"An error occurred: {e}")
+    st.error(f"An error occurred within app!")
