@@ -1,4 +1,3 @@
-
 import streamlit as st
 import PyPDF2
 import tempfile
@@ -130,6 +129,30 @@ try:
             st.subheader("Extracted Text")
             st.text_area("Text Preview", text, height=300)
 
+            # Language selection
+            lang_dict = {
+                'English (Australia)': 'en',
+                'English (United Kingdom)': 'en',
+                'English (United States)': 'en',
+                'English (Canada)': 'en',
+                'English (India)': 'en',
+                'English (Ireland)': 'en',
+                'English (South Africa)': 'en',
+                'English (Nigeria)': 'en',
+                'French (Canada)': 'fr',
+                'French (France)': 'fr',
+                'Mandarin (China Mainland)': 'zh-CN',
+                'Mandarin (Taiwan)': 'zh-TW',
+                'Portuguese (Brazil)': 'pt',
+                'Portuguese (Portugal)': 'pt',
+                'Spanish (Mexico)': 'es',
+                'Spanish (Spain)': 'es',
+                'Spanish (United States)': 'es'
+            }
+            language_choice = st.selectbox("Choose the language for audio conversion", list(lang_dict.keys()))
+
+            lang_abbr = lang_dict[language_choice]  # Get the language abbreviation for gTTS
+
             # Conversion formats for the app
             op_form = st.selectbox(
                 "Choose the output format",
@@ -143,7 +166,7 @@ try:
                 if op_form in ["MP3", "WAV"]:
                     # Use gTTS for audio conversion
                     output_file_path = gtts_text_to_audio(
-                        text, lang="en", suffix=f".{op_form.lower()}", p_of_c=p_of_c, p_level=p_level
+                        text, lang=lang_abbr, suffix=f".{op_form.lower()}", p_of_c=p_of_c, p_level=p_level
                     )
                     mime_type = f"audio/{op_form.lower()}"
                     download_label = f"Download {op_form.upper()}"
@@ -191,3 +214,6 @@ try:
     st.markdown(hide, unsafe_allow_html=True)
 except Exception as e:
     st.error(f"An error occurred within app!")
+
+
+
