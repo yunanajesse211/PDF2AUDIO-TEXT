@@ -3,3 +3,4 @@ PyPDF2
 pyttsx3
 python-docx
 Pillow
+gtts
